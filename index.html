@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MontanaTimberline — Cordwood &amp; Sawdust, Kalispell MT</title>
+<meta name="description" content="Loose cordwood and sawdust, sold by weight. Pull your trailer in, we fill it, you pay by the pound. Kalispell, Montana.">
+
+<!--
+  DEV NOTE FOR MontanaTimberline OWNER:
+  Sections marked "PLACEHOLDER" below still need real info:
+  wood species + pricing, hours, phone/email, and delivery details.
+  Search this file for "TBD" to find every spot to update.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #EDE5D0;
+    --paper: #F6F1E3;
+    --ink: #241D14;
+    --ink-soft: #4A4132;
+    --forest: #32453A;
+    --forest-dark: #22302A;
+    --bark: #5B3F2C;
+    --amber: #C88A2E;
+    --amber-dark: #A9701F;
+    --moss: #7C8863;
+    --line: rgba(34,28,18,0.14);
+
+    --display: 'Fraunces', serif;
+    --body: 'Inter', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  img,svg{ display:block; max-width:100%; }
+  a{ color: inherit; }
+
+  .wrap{
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* Texture: faint woodgrain rings in the background */
+  .grain-bg{
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      radial-gradient(circle at 85% 8%, rgba(50,69,58,0.06), transparent 45%),
+      radial-gradient(circle at 10% 90%, rgba(91,63,44,0.08), transparent 40%);
+    background-color: var(--bg);
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(237,229,208,0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 18px 0;
+  }
+  .logo{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.35rem;
+    letter-spacing: 0.01em;
+    display:flex;
+    align-items:baseline;
+    gap: 8px;
+    text-decoration:none;
+    color: var(--forest-dark);
+  }
+  .logo .mark{
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--amber-dark);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border: 1px solid var(--amber-dark);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+  nav ul{
+    list-style:none;
+    display:flex;
+    gap: 30px;
+    margin:0; padding:0;
+  }
+  nav ul a{
+    text-decoration:none;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    transition: color 0.15s;
+  }
+  nav ul a:hover{ color: var(--forest-dark); }
+  .nav-cta{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background: var(--forest);
+    color: var(--paper);
+    padding: 10px 18px;
+    border-radius: 4px;
+    text-decoration:none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .nav-cta:hover{ background: var(--forest-dark); }
+  .nav-links-desktop{ display:flex; align-items:center; gap: 34px; }
+  .menu-toggle{ display:none; }
+
+  @media (max-width: 780px){
+    .nav-links-desktop nav{ display:none; }
+    .menu-toggle{
+      display:block;
+      background:none;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-family: var(--body);
+      font-size: 0.85rem;
+    }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding: 84px 0 70px;
+    display:grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 56px;
+    align-items:center;
+  }
+  .eyebrow{
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--amber-dark);
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .eyebrow::before{
+    content:"";
+    width: 22px; height: 1px;
+    background: var(--amber-dark);
+  }
+  h1{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(2.4rem, 4.6vw, 3.6rem);
+    line-height: 1.06;
+    margin: 0 0 22px;
+    color: var(--forest-dark);
+  }
+  h1 em{
+    font-style: italic;
+    font-weight: 500;
+    color: var(--bark);
+  }
+  .hero p.lede{
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 0 0 32px;
+  }
+  .hero-ctas{ display:flex; gap:14px; flex-wrap:wrap; }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding: 13px 24px;
+    border-radius: 4px;
+    text-decoration:none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: transform 0.15s, background 0.15s;
+  }
+  .btn-primary{ background: var(--amber); color: #26190a; }
+  .btn-primary:hover{ background: var(--amber-dark); transform: translateY(-1px); }
+  .btn-ghost{ background: transparent; border: 1px solid var(--line); color: var(--ink); }
+  .btn-ghost:hover{ border-color: var(--forest); color: var(--forest-dark); }
+
+  /* ---- Scale diagram: the signature element ---- */
+  .scale-card{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 30px 26px 24px;
+    position: relative;
+  }
+  .scale-card .cap{
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--moss);
+    margin-bottom: 14px;
+  }
+  .scale-readout{
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--mono);
+    margin-bottom: 6px;
+  }
+  .scale-readout .label{ font-size: 0.8rem; color: var(--ink-soft); }
+  .scale-readout .num{
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--forest-dark);
+    font-variant-numeric: tabular-nums;
+  }
+  .scale-track{
+    height: 10px;
+    border-radius: 6px;
+    background: rgba(50,69,58,0.12);
+    overflow: hidden;
+    margin: 14px 0 22px;
+  }
+  .scale-fill{
+    height: 100%;
+    width: 12%;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--moss), var(--amber));
+    animation: fillTrailer 5s ease-in-out infinite;
+  }
+  @keyframes fillTrailer{
+    0%   { width: 10%; }
+    35%  { width: 10%; }
+    65%  { width: 88%; }
+    100% { width: 88%; }
+  }
+  .scale-steps{
+    display:flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 22px;
+  }
+  .scale-result{
+    border-top: 1px dashed var(--line);
+    padding-top: 18px;
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+  }
+  .scale-result .txt{ font-size: 0.85rem; color: var(--ink-soft); }
+  .scale-result .price{
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--bark);
+  }
+
+  /* ---------- Section shell ---------- */
+  section{ padding: 78px 0; }
+  .section-head{ margin-bottom: 44px; max-width: 60ch; }
+  .section-head .eyebrow{ margin-bottom: 12px; }
+  h2{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    color: var(--forest-dark);
+    margin: 0 0 14px;
+  }
+  .section-head p{ color: var(--ink-soft); font-size: 1.02rem; margin:0; }
+
+  /* ---------- How it works ---------- */
+  .how{ background: var(--forest-dark); color: var(--paper); border-radius: 14px; }
+  .how .wrap{ padding: 70px 28px; }
+  .how .section-head p{ color: rgba(246,241,227,0.72); }
+  .how .section-head h2{ color: var(--paper); }
+  .how .eyebrow{ color: var(--amber); }
+  .how .eyebrow::before{ background: var(--amber); }
+
+  .steps{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1px solid rgba(246,241,227,0.15);
+  }
+  .step{
+    padding: 26px 22px 0;
+    border-right: 1px solid rgba(246,241,227,0.15);
+  }
+  .step:last-child{ border-right:none; }
+  .step .n{
+    font-family: var(--mono);
+    color: var(--amber);
+    font-size: 0.85rem;
+    display:block;
+    margin-bottom: 14px;
+  }
+  .step h3{
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 1.15rem;
+    margin: 0 0 10px;
+  }
+  .step p{
+    font-size: 0.92rem;
+    color: rgba(246,241,227,0.72);
+    margin:0 0 26px;
+  }
+
+  @media (max-width: 860px){
+    .steps{ grid-template-columns: 1fr 1fr; }
+    .step{ border-right:none; border-bottom: 1px solid rgba(246,241,227,0.15); padding-bottom: 20px; }
+  }
+  @media (max-width: 520px){
+    .steps{ grid-template-columns: 1fr; }
+  }
+
+  /* ---------- What we sell ---------- */
+  .products{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  .card{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 28px 24px;
+  }
+  .card .icon{
+    width: 40px; height: 40px;
+    margin-bottom: 18px;
+  }
+  .card h3{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.3rem;
+    margin: 0 0 8px;
+    color: var(--forest-dark);
+  }
+  .card .tag{
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--moss);
+    margin-bottom: 14px;
+    display:block;
+  }
+  .card p{ color: var(--ink-soft); font-size: 0.95rem; margin: 0 0 18px; }
+  .card .price-line{
+    border-top: 1px dashed var(--line);
+    padding-top: 14px;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--bark);
+  }
+
+  @media (max-width: 860px){ .products{ grid-template-columns: 1fr; } }
+
+  /* ---------- Hours & location ---------- */
+  .split{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items:start;
+  }
+  .info-block{ margin-bottom: 30px; }
+  .info-block h4{
+    font-family: var(--mono);
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    color: var(--moss);
+    margin: 0 0 10px;
+  }
+  .hours-table{ width:100%; border-collapse: collapse; font-family: var(--mono); font-size: 0.92rem; }
+  .hours-table td{ padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .hours-table td:last-child{ text-align: right; color: var(--ink-soft); }
+  .addr{
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin: 0 0 16px;
+  }
+  .map-frame{
+    border-radius: 10px;
+    overflow:hidden;
+    border: 1px solid var(--line);
+    height: 320px;
+    background: var(--paper);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 20px;
+  }
+  .map-frame .m-icon{ margin: 0 auto 14px; }
+  .map-frame p{ color: var(--ink-soft); font-size: 0.9rem; max-width: 28ch; margin: 0 0 16px;}
+
+  @media (max-width: 860px){ .split{ grid-template-columns: 1fr; } }
+
+  /* ---------- Delivery banner ---------- */
+  .delivery{
+    background: var(--bark);
+    color: var(--paper);
+    border-radius: 14px;
+    padding: 44px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+  .delivery h3{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.6rem;
+    margin: 0 0 8px;
+  }
+  .delivery p{ margin:0; color: rgba(246,241,227,0.78); max-width: 46ch; }
+  .badge-soon{
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    background: rgba(246,241,227,0.14);
+    padding: 6px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{ padding: 60px 0 40px; border-top: 1px solid var(--line); margin-top: 40px; }
+  .foot-grid{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-wrap: wrap;
+    gap: 30px;
+  }
+  .foot-logo{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--forest-dark);
+    margin-bottom: 8px;
+  }
+  footer .addr-small{ font-size: 0.9rem; color: var(--ink-soft); }
+  .foot-note{
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    opacity: 0.7;
+    margin-top: 40px;
+  }
+
+  ::selection{ background: var(--amber); color: #26190a; }
+  :focus-visible{ outline: 2px solid var(--forest-dark); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .scale-fill{ animation: none; width: 55%; }
+  }
+
+  @media (max-width: 780px){
+    .hero{ grid-template-columns: 1fr; padding-top: 50px; }
+  }
+</style>
+</head>
+<body>
+<div class="grain-bg"></div>
+
+<header>
+  <div class="wrap nav">
+    <a href="#top" class="logo">MontanaTimberline <span class="mark">Kalispell, MT</span></a>
+    <div class="nav-links-desktop">
+      <nav>
+        <ul>
+          <li><a href="#sell">What We Sell</a></li>
+          <li><a href="#how">How It Works</a></li>
+          <li><a href="#visit">Hours &amp; Location</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <a class="nav-cta" href="#contact">Get in touch</a>
+      <a class="nav-cta" href="portal.html" style="background: transparent; border: 1px solid var(--forest); color: var(--forest-dark);">Staff Login</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <div class="wrap hero">
+    <div>
+      <div class="eyebrow">Flathead Valley Firewood Lot</div>
+      <h1>Loose cordwood,<br><em>weighed fair,</em> sold by the pound.</h1>
+      <p class="lede">
+        Pull your trailer onto our lot in Kalispell, tell us what you need, and we load it right there.
+        No pre-splitting into bundles, no guessing — you pay for exactly what leaves with you.
+      </p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#sell">See what we sell</a>
+        <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=1960+Helena+Flats+Rd+Kalispell+MT+59901" target="_blank" rel="noopener">Get directions</a>
+      </div>
+    </div>
+
+    <div class="scale-card">
+      <div class="cap">// how your total gets calculated</div>
+      <div class="scale-readout">
+        <span class="label">Trailer, empty</span>
+        <span class="num">4,120 lb</span>
+      </div>
+      <div class="scale-track"><div class="scale-fill"></div></div>
+      <div class="scale-steps">
+        <span>Weigh in</span>
+        <span>Fill on the lot</span>
+        <span>Weigh out</span>
+      </div>
+      <div class="scale-result">
+        <span class="txt">Net wood weight × price / lb</span>
+        <span class="price">= your total</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <div class="wrap">
+    <section class="how" id="how">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">The process</div>
+          <h2>Four stops, start to finish</h2>
+          <p>Everything is weighed, not eyeballed — so what you pay always matches what's actually in your trailer.</p>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <span class="n">01</span>
+            <h3>Pull onto the scale</h3>
+            <p>Drive your empty trailer up. We record its starting weight before anything gets loaded.</p>
+          </div>
+          <div class="step">
+            <span class="n">02</span>
+            <h3>Tell us what you need</h3>
+            <p>Pick your wood or sawdust and how much you're after. We'll point you to the right pile.</p>
+          </div>
+          <div class="step">
+            <span class="n">03</span>
+            <h3>We fill your trailer</h3>
+            <p>We load it on the spot with exactly what you ordered — no pre-bagged bundles to guess at.</p>
+          </div>
+          <div class="step">
+            <span class="n">04</span>
+            <h3>Weigh out &amp; pay</h3>
+            <p>Back on the scale. The difference is your net weight — that's what determines your total.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ WHAT WE SELL ============ -->
+  <div class="wrap">
+    <section id="sell">
+      <div class="section-head">
+        <div class="eyebrow">On the lot</div>
+        <h2>What we sell</h2>
+        <p>Two loose cordwood options and sawdust, all priced by the pound at pickup. Species and current
+          rates are being finalized — call ahead for today's pricing.</p>
+        <p id="data-freshness" style="font-family: var(--mono); font-size: 0.75rem; color: var(--moss); margin-top: 10px; display:none;"></p>
+      </div>
+
+      <div class="products">
+        <div class="card">
+          <svg class="icon" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="17" stroke="#5B3F2C" stroke-width="2"/><circle cx="20" cy="20" r="11" stroke="#5B3F2C" stroke-width="1.4"/><circle cx="20" cy="20" r="5" stroke="#C88A2E" stroke-width="1.4"/></svg>
+          <span class="tag" id="wood1-tag">Cordwood — Option 1</span>
+          <h3 id="wood1-name">Wood Type 1</h3>
+          <p id="wood1-desc">Species and description coming soon. Good for stove or fireplace use — ask us on the lot for details.</p>
+          <div class="price-line" id="wood1-price">Priced per lb at pickup — call for today's rate</div>
+        </div>
+
+        <div class="card">
+          <svg class="icon" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="17" stroke="#5B3F2C" stroke-width="2"/><circle cx="20" cy="20" r="11" stroke="#5B3F2C" stroke-width="1.4"/><circle cx="20" cy="20" r="5" stroke="#C88A2E" stroke-width="1.4"/></svg>
+          <span class="tag" id="wood2-tag">Cordwood — Option 2</span>
+          <h3 id="wood2-name">Wood Type 2</h3>
+          <p id="wood2-desc">Species and description coming soon. A second option for those who want a mix or a different burn.</p>
+          <div class="price-line" id="wood2-price">Priced per lb at pickup — call for today's rate</div>
+        </div>
+
+        <div class="card">
+          <svg class="icon" viewBox="0 0 40 40" fill="none"><path d="M6 28c3-10 8-16 14-16s11 6 14 16" stroke="#5B3F2C" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="30" r="1.6" fill="#C88A2E"/><circle cx="20" cy="32" r="1.6" fill="#C88A2E"/><circle cx="28" cy="30" r="1.6" fill="#C88A2E"/></svg>
+          <span class="tag">By-product</span>
+          <h3>Loose Sawdust</h3>
+          <p id="sawdust-desc">Great for bedding, mulch, or shop use. Sold loose, straight into your trailer, by weight.</p>
+          <div class="price-line" id="sawdust-price">Priced per lb at pickup — call for today's rate</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ HOURS & LOCATION ============ -->
+  <div class="wrap">
+    <section id="visit">
+      <div class="section-head">
+        <div class="eyebrow">Plan your trip</div>
+        <h2>Hours &amp; location</h2>
+        <p>Bring a trailer with sides — loose cordwood and sawdust don't stack like split bundles.</p>
+      </div>
+
+      <div class="split">
+        <div>
+          <div class="info-block">
+            <h4>Hours</h4>
+            <table class="hours-table">
+              <tr><td>Monday – Friday</td><td>Hours coming soon</td></tr>
+              <tr><td>Saturday</td><td>Hours coming soon</td></tr>
+              <tr><td>Sunday</td><td>Hours coming soon</td></tr>
+            </table>
+          </div>
+          <div class="info-block">
+            <h4>Address</h4>
+            <p class="addr">1960 Helena Flats Rd<br>Kalispell, MT 59901</p>
+            <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=1960+Helena+Flats+Rd+Kalispell+MT+59901" target="_blank" rel="noopener">Open in Google Maps</a>
+          </div>
+        </div>
+
+        <div class="map-frame">
+          <div>
+            <svg class="m-icon" width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M12 22s7-7.58 7-13a7 7 0 10-14 0c0 5.42 7 13 7 13z" stroke="#32453A" stroke-width="1.6"/><circle cx="12" cy="9" r="2.4" stroke="#32453A" stroke-width="1.6"/></svg>
+            <p>1960 Helena Flats Rd, Kalispell, MT 59901</p>
+            <a class="btn btn-primary" href="https://www.google.com/maps/search/?api=1&query=1960+Helena+Flats+Rd+Kalispell+MT+59901" target="_blank" rel="noopener">Get directions</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ DELIVERY ============ -->
+  <div class="wrap">
+    <section style="padding-top:0;">
+      <div class="delivery">
+        <div>
+          <h3>Delivery</h3>
+          <p>We're setting up delivery for folks who can't make it out to the lot. Details on service area and pricing are on the way.</p>
+        </div>
+        <span class="badge-soon">Coming soon</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ CONTACT ============ -->
+  <div class="wrap">
+    <section id="contact">
+      <div class="section-head">
+        <div class="eyebrow">Reach us</div>
+        <h2>Contact</h2>
+        <p>Phone and email are being set up — check back soon, or stop by the lot during business hours once they're posted.</p>
+      </div>
+      <div class="info-block">
+        <h4>In the meantime</h4>
+        <p class="addr">1960 Helena Flats Rd, Kalispell, MT 59901</p>
+      </div>
+    </section>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo">MontanaTimberline</div>
+        <div class="addr-small">1960 Helena Flats Rd, Kalispell, MT 59901</div>
+      </div>
+      <div class="addr-small">Loose cordwood &amp; sawdust — weighed in, weighed out, priced fair.</div>
+    </div>
+    <div class="foot-note">&copy; <span id="yr"></span> MontanaTimberline. Site content marked "coming soon" is a placeholder pending final details.</div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  /* ============================================================
+     LIVE PRICING / STOCK FEED
+     ------------------------------------------------------------
+     This pulls current prices + stock status from a small JSON
+     file that gets exported out of the Excel POS workbook (via a
+     macro) and synced to a cloud folder (OneDrive / Google Drive).
+
+     TO ACTIVATE:
+     1. Get the "anyone with the link can view" / direct file URL
+        for the exported JSON once it's synced to the cloud.
+     2. Paste that URL into DATA_URL below.
+     That's it — everything else here already handles it.
+
+     If DATA_URL is empty, or the fetch fails for any reason, the
+     page just keeps showing the static "call for today's rate"
+     text already in the HTML. Nothing breaks either way.
+
+     EXPECTED JSON SHAPE (see excel-export-instructions.txt):
+     {
+       "updated_at": "2026-08-13T09:15:00",
+       "wood1": { "name": "Lodgepole Pine", "desc": "...", "price_per_lb": 0.09, "in_stock": true },
+       "wood2": { "name": "Douglas Fir",   "desc": "...", "price_per_lb": 0.11, "in_stock": true },
+       "sawdust": { "desc": "...", "price_per_lb": 0.02, "in_stock": true }
+     }
+     ============================================================ */
+  const DATA_URL = ""; // <-- paste the published JSON link here when ready
+
+  async function loadLiveData(){
+    if(!DATA_URL) return;
+    try{
+      const res = await fetch(DATA_URL, { cache: "no-store" });
+      if(!res.ok) throw new Error("bad response");
+      const data = await res.json();
+
+      const setPrice = (elId, item) => {
+        const el = document.getElementById(elId);
+        if(!el || !item) return;
+        if(item.in_stock === false){
+          el.textContent = "Currently sold out";
+        } else if(typeof item.price_per_lb === "number"){
+          el.textContent = "$" + item.price_per_lb.toFixed(2) + " / lb at pickup";
+        }
+      };
+
+      if(data.wood1){
+        if(data.wood1.name) document.getElementById('wood1-name').textContent = data.wood1.name;
+        if(data.wood1.desc) document.getElementById('wood1-desc').textContent = data.wood1.desc;
+        setPrice('wood1-price', data.wood1);
+      }
+      if(data.wood2){
+        if(data.wood2.name) document.getElementById('wood2-name').textContent = data.wood2.name;
+        if(data.wood2.desc) document.getElementById('wood2-desc').textContent = data.wood2.desc;
+        setPrice('wood2-price', data.wood2);
+      }
+      if(data.sawdust){
+        if(data.sawdust.desc) document.getElementById('sawdust-desc').textContent = data.sawdust.desc;
+        setPrice('sawdust-price', data.sawdust);
+      }
+      if(data.updated_at){
+        const el = document.getElementById('data-freshness');
+        el.textContent = "Pricing last updated " + new Date(data.updated_at).toLocaleString();
+        el.style.display = "block";
+      }
+    }catch(err){
+      // Fetch failed or file not ready yet — static placeholder text stays as-is.
+      console.log("Live pricing feed not available yet:", err.message);
+    }
+  }
+  loadLiveData();
+</script>
+
+</body>
+</html>

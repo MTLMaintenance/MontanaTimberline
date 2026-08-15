@@ -1,0 +1,10 @@
+# The site is still being built and tested — not ready to be indexed yet.
+# Once it's ready to go live, either delete this file or change the
+# rule below to allow crawling (see the commented-out version).
+
+User-agent: *
+Disallow: /
+
+# When ready to go live, replace the two lines above with:
+# User-agent: *
+# Allow: /

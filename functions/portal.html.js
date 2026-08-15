@@ -5,48 +5,48 @@
 // page on the site (index.html, images, etc.) stays plain static
 // content — free and unlimited, never touching this code at all.
 //
-// Credentials are NOT stored here. They come from environment
-// variables set in the Cloudflare dashboard (see setup steps),
-// so nothing sensitive ever lives in the GitHub repo.
+// This checks for a valid signed session cookie (set by
+// functions/api/login.js after a correct login on login.html). If
+// there's no valid cookie, it redirects to the login page instead
+// of showing the portal — no browser popup involved.
 
 export async function onRequest(context) {
   const { request, env } = context;
+  const secret = env.SESSION_SECRET;
+  const url = new URL(request.url);
 
-  const expectedUser = env.STAFF_USER;
-  const expectedPass = env.STAFF_PASSWORD;
+  if (secret) {
+    const cookieHeader = request.headers.get("Cookie") || "";
+    const match = cookieHeader.match(/mtl_staff_session=([^;]+)/);
 
-  // Safety check: if the env vars haven't been set yet in Cloudflare,
-  // fail closed (block access) rather than accidentally leaving the
-  // page open.
-  if (!expectedUser || !expectedPass) {
-    return new Response(
-      "Staff login isn't configured yet. Set STAFF_USER and STAFF_PASSWORD in Cloudflare Pages settings.",
-      { status: 503 }
-    );
-  }
+    if (match) {
+      const [expiryStr, signature] = match[1].split(".");
+      const expiry = Number(expiryStr);
 
-  const authHeader = request.headers.get("Authorization");
-
-  if (authHeader && authHeader.startsWith("Basic ")) {
-    const encoded = authHeader.slice(6);
-    const decoded = atob(encoded); // "username:password"
-    const separatorIndex = decoded.indexOf(":");
-    const user = decoded.slice(0, separatorIndex);
-    const pass = decoded.slice(separatorIndex + 1);
-
-    if (user === expectedUser && pass === expectedPass) {
-      // Correct credentials — serve the actual portal.html file.
-      return context.next();
+      if (expiry && expiry > Date.now() && signature) {
+        const expectedSignature = await sign(secret, expiryStr);
+        if (expectedSignature === signature) {
+          return context.next(); // valid session — serve the real portal.html
+        }
+      }
     }
   }
 
-  // No credentials, or wrong ones — ask the browser to prompt for a
-  // username/password. This is the browser's own built-in login box,
-  // no custom page needed.
-  return new Response("Authentication required.", {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": 'Basic realm="MontanaTimberline Staff", charset="UTF-8"',
-    },
-  });
+  // No valid session — send them to the styled login page, remembering
+  // where they were trying to go.
+  return Response.redirect(`${url.origin}/login.html?redirect=/portal.html`, 302);
+}
+
+async function sign(secret, message) {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sigBuffer = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(message));
+  return Array.from(new Uint8Array(sigBuffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }

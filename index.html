@@ -208,80 +208,6 @@
   .btn-ghost{ background: transparent; border: 1px solid var(--line); color: var(--ink); }
   .btn-ghost:hover{ border-color: var(--forest); color: var(--forest-dark); }
 
-  /* ---- Scale diagram: the signature element ---- */
-  .scale-card{
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 30px 26px 24px;
-    position: relative;
-  }
-  .scale-card .cap{
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--moss);
-    margin-bottom: 14px;
-  }
-  .scale-readout{
-    display:flex;
-    justify-content: space-between;
-    align-items: baseline;
-    font-family: var(--mono);
-    margin-bottom: 6px;
-  }
-  .scale-readout .label{ font-size: 0.8rem; color: var(--ink-soft); }
-  .scale-readout .num{
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--forest-dark);
-    font-variant-numeric: tabular-nums;
-  }
-  .scale-track{
-    height: 10px;
-    border-radius: 6px;
-    background: rgba(50,69,58,0.12);
-    overflow: hidden;
-    margin: 14px 0 22px;
-  }
-  .scale-fill{
-    height: 100%;
-    width: 12%;
-    border-radius: 6px;
-    background: linear-gradient(90deg, var(--moss), var(--amber));
-    animation: fillTrailer 5s ease-in-out infinite;
-  }
-  @keyframes fillTrailer{
-    0%   { width: 10%; }
-    35%  { width: 10%; }
-    65%  { width: 88%; }
-    100% { width: 88%; }
-  }
-  .scale-steps{
-    display:flex;
-    justify-content: space-between;
-    font-family: var(--mono);
-    font-size: 0.68rem;
-    color: var(--ink-soft);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 22px;
-  }
-  .scale-result{
-    border-top: 1px dashed var(--line);
-    padding-top: 18px;
-    display:flex;
-    justify-content: space-between;
-    align-items:center;
-  }
-  .scale-result .txt{ font-size: 0.85rem; color: var(--ink-soft); }
-  .scale-result .price{
-    font-family: var(--display);
-    font-style: italic;
-    font-size: 1.5rem;
-    color: var(--bark);
-  }
 
   /* ---------- Section shell ---------- */
   section{ padding: 78px 0; }
@@ -532,25 +458,7 @@
       </div>
     </div>
 
-    <div class="scale-card">
-      <div class="cap">// how your total gets calculated</div>
-      <div class="scale-readout">
-        <span class="label">Trailer, empty</span>
-        <span class="num">4,120 lb</span>
-      </div>
-      <div class="scale-track"><div class="scale-fill"></div></div>
-      <div class="scale-steps">
-        <span>Weigh in</span>
-        <span>Fill on the lot</span>
-        <span>Weigh out</span>
-      </div>
-      <div class="scale-result">
-        <span class="txt">Net wood weight × price / lb</span>
-        <span class="price">= your total</span>
-      </div>
-    </div>
-  </div>
-
+  
   <!-- ============ HOW IT WORKS ============ -->
   <div class="wrap">
     <section class="how" id="how">

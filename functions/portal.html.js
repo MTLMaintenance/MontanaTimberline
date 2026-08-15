@@ -9,6 +9,11 @@
 // functions/api/login.js after a correct login on login.html). If
 // there's no valid cookie, it redirects to the login page instead
 // of showing the portal — no browser popup involved.
+//
+// IMPORTANT: every response here is explicitly marked as
+// non-cacheable. Without that, Cloudflare's edge cache (or a shared
+// proxy) could serve a saved copy of the authenticated page to
+// someone who was never actually logged in.
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -26,15 +31,24 @@ export async function onRequest(context) {
       if (expiry && expiry > Date.now() && signature) {
         const expectedSignature = await sign(secret, expiryStr);
         if (expectedSignature === signature) {
-          return context.next(); // valid session — serve the real portal.html
+          // Valid session — serve the real portal.html, but strip out
+          // any caching so it's never stored/shared at the edge.
+          const response = await context.next();
+          const noCacheResponse = new Response(response.body, response);
+          noCacheResponse.headers.set("Cache-Control", "private, no-store, must-revalidate");
+          noCacheResponse.headers.set("Vary", "Cookie");
+          return noCacheResponse;
         }
       }
     }
   }
 
   // No valid session — send them to the styled login page, remembering
-  // where they were trying to go.
-  return Response.redirect(`${url.origin}/login.html?redirect=/portal.html`, 302);
+  // where they were trying to go. Also explicitly non-cacheable.
+  const redirect = Response.redirect(`${url.origin}/login.html?redirect=/portal.html`, 302);
+  const noCacheRedirect = new Response(redirect.body, redirect);
+  noCacheRedirect.headers.set("Cache-Control", "private, no-store, must-revalidate");
+  return noCacheRedirect;
 }
 
 async function sign(secret, message) {

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Login — MontanaTimberline</title>
+<meta name="robots" content="noindex, nofollow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #EDE5D0;
+    --paper: #F6F1E3;
+    --ink: #241D14;
+    --ink-soft: #4A4132;
+    --forest: #32453A;
+    --forest-dark: #22302A;
+    --bark: #5B3F2C;
+    --amber: #C88A2E;
+    --amber-dark: #A9701F;
+    --moss: #7C8863;
+    --line: rgba(34,28,18,0.14);
+    --error: #A3392E;
+    --display: 'Fraunces', serif;
+    --body: 'Inter', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    padding: 24px;
+  }
+  .panel{
+    max-width: 400px;
+    width:100%;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 40px 36px;
+  }
+  .eyebrow{
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber-dark);
+    margin-bottom: 10px;
+  }
+  h1{
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.6rem;
+    color: var(--forest-dark);
+    margin: 0 0 8px;
+  }
+  .sub{ color: var(--ink-soft); font-size: 0.92rem; margin: 0 0 26px; }
+
+  label{
+    display:block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--moss);
+    margin-bottom: 6px;
+  }
+  input{
+    width:100%;
+    padding: 11px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 0.95rem;
+    margin-bottom: 18px;
+  }
+  input:focus{ outline: 2px solid var(--forest); outline-offset: 1px; }
+
+  button{
+    width:100%;
+    padding: 13px;
+    border: none;
+    border-radius: 6px;
+    background: var(--forest);
+    color: var(--paper);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button:hover{ background: var(--forest-dark); }
+  button:disabled{ opacity: 0.6; cursor: default; }
+
+  .error{
+    display:none;
+    background: rgba(163,57,46,0.1);
+    border: 1px solid rgba(163,57,46,0.3);
+    color: var(--error);
+    font-size: 0.85rem;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 18px;
+  }
+  .error.show{ display:block; }
+
+  .back{
+    display:inline-block;
+    margin-top: 18px;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+  }
+  .back:hover{ color: var(--forest-dark); }
+</style>
+</head>
+<body>
+
+  <div class="panel">
+    <div class="eyebrow">MontanaTimberline · Staff</div>
+    <h1>Staff Login</h1>
+    <p class="sub">Sign in to reach internal tools.</p>
+
+    <div class="error" id="error-box"></div>
+
+    <form id="login-form">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" autocomplete="username" required>
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required>
+
+      <button type="submit" id="submit-btn">Log in</button>
+    </form>
+
+    <a class="back" href="index.html">← Back to site</a>
+  </div>
+
+  <script>
+    const form = document.getElementById('login-form');
+    const errorBox = document.getElementById('error-box');
+    const submitBtn = document.getElementById('submit-btn');
+
+    // If they were redirected here trying to reach a specific page,
+    // send them back there after a successful login.
+    const params = new URLSearchParams(window.location.search);
+    const redirectTo = params.get('redirect') || '/portal.html';
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.classList.remove('show');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Logging in…';
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+          }),
+        });
+
+        if (res.ok) {
+          window.location.href = redirectTo;
+        } else {
+          const data = await res.json().catch(() => ({}));
+          errorBox.textContent = data.error || 'Login failed. Check your username and password.';
+          errorBox.classList.add('show');
+        }
+      } catch (err) {
+        errorBox.textContent = 'Something went wrong. Try again.';
+        errorBox.classList.add('show');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Log in';
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -82,7 +82,7 @@
   .nav{
     display:flex;
     align-items:center;
-    justify-content:space-between;
+    gap: 56px;
     padding: 18px 0;
   }
   .logo{
@@ -95,6 +95,7 @@
     gap: 8px;
     text-decoration:none;
     color: var(--forest-dark);
+    flex-shrink: 0;
   }
   .logo .mark{
     font-family: var(--mono);
@@ -111,7 +112,7 @@
   nav ul{
     list-style:none;
     display:flex;
-    gap: 30px;
+    gap: 46px;
     margin:0; padding:0;
   }
   nav ul a{
@@ -137,7 +138,7 @@
     transition: background 0.15s;
   }
   .nav-cta:hover{ background: var(--forest-dark); }
-  .nav-links-desktop{ display:flex; align-items:center; gap: 34px; }
+  .nav-links-desktop{ display:flex; align-items:center; gap: 34px; flex: 1; justify-content: space-between; }
   .menu-toggle{ display:none; }
 
   @media (max-width: 780px){

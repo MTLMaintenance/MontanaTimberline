@@ -56,14 +56,17 @@
     padding: 0 28px;
   }
 
-  /* Texture: faint woodgrain rings in the background */
+  /* Texture: subtle wood-grain streaks + soft knot blooms */
   .grain-bg{
     position: fixed;
     inset: 0;
     z-index: -1;
     background-image:
-      radial-gradient(circle at 85% 8%, rgba(50,69,58,0.06), transparent 45%),
-      radial-gradient(circle at 10% 90%, rgba(91,63,44,0.08), transparent 40%);
+      repeating-linear-gradient(91deg, rgba(91,63,44,0.045) 0px, rgba(91,63,44,0.045) 1px, transparent 1px, transparent 8px),
+      repeating-linear-gradient(91deg, rgba(200,138,46,0.03) 0px, rgba(200,138,46,0.03) 2px, transparent 2px, transparent 15px),
+      radial-gradient(ellipse 420px 240px at 84% 6%, rgba(50,69,58,0.11), transparent 60%),
+      radial-gradient(ellipse 320px 520px at 4% 94%, rgba(91,63,44,0.13), transparent 55%),
+      radial-gradient(circle 140px at 62% 48%, rgba(91,63,44,0.06), transparent 70%);
     background-color: var(--bg);
   }
 
@@ -99,9 +102,11 @@
     color: var(--amber-dark);
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    border: 1px solid var(--amber-dark);
+    border: 1px dashed var(--amber-dark);
     padding: 2px 6px;
     border-radius: 3px;
+    transform: rotate(-2deg);
+    display: inline-block;
   }
   nav ul{
     list-style:none;
@@ -166,8 +171,11 @@
   }
   .eyebrow::before{
     content:"";
-    width: 22px; height: 1px;
-    background: var(--amber-dark);
+    width: 26px; height: 8px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 10'%3E%3Cpath d='M0 9 L4 1 L8 9 L12 1 L16 9 L20 1 L24 9 L28 1 L32 9 L36 1 L40 9' fill='none' stroke='%23A9701F' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+    flex-shrink: 0;
   }
   h1{
     font-family: var(--display);
@@ -194,7 +202,8 @@
     align-items:center;
     gap:8px;
     padding: 13px 24px;
-    border-radius: 4px;
+    border-radius: 0;
+    clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
     text-decoration:none;
     font-weight: 600;
     font-size: 0.95rem;
@@ -220,12 +229,32 @@
   .section-head p{ color: var(--ink-soft); font-size: 1.02rem; margin:0; }
 
   /* ---------- How it works ---------- */
-  .how{ background: var(--forest-dark); color: var(--paper); border-radius: 14px; }
+  .how{
+    background: var(--forest-dark);
+    color: var(--paper);
+    border-radius: 3px;
+    position: relative;
+    margin: 26px 0;
+  }
+  .how::before, .how::after{
+    content:"";
+    position:absolute;
+    left:0; right:0;
+    height: 15px;
+    background-image:
+      linear-gradient(135deg, var(--bg) 50%, transparent 50%),
+      linear-gradient(225deg, var(--bg) 50%, transparent 50%);
+    background-size: 26px 26px;
+    background-position: 0 0, 13px 0;
+    background-repeat: repeat-x;
+  }
+  .how::before{ top: -14px; }
+  .how::after{ bottom: -14px; transform: scaleY(-1); }
   .how .wrap{ padding: 70px 28px; }
   .how .section-head p{ color: rgba(246,241,227,0.72); }
   .how .section-head h2{ color: var(--paper); }
   .how .eyebrow{ color: var(--amber); }
-  .how .eyebrow::before{ background: var(--amber); }
+  .how .eyebrow::before{ filter: brightness(1.3); }
 
   .steps{
     display:grid;
@@ -273,13 +302,25 @@
   }
   .card{
     background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: 10px;
+    border: 1.5px solid var(--line);
+    border-radius: 0;
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
     padding: 28px 24px;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .card:hover{ border-color: var(--bark); transform: translateY(-2px); }
+  .card .icon-wrap{
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: 1.5px solid var(--bark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom: 18px;
   }
   .card .icon{
-    width: 40px; height: 40px;
-    margin-bottom: 18px;
+    width: 26px; height: 26px;
+    margin-bottom: 0;
   }
   .card h3{
     font-family: var(--display);
@@ -353,7 +394,8 @@
   .delivery{
     background: var(--bark);
     color: var(--paper);
-    border-radius: 14px;
+    border-radius: 0;
+    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
     padding: 44px 40px;
     display:flex;
     justify-content:space-between;
@@ -504,7 +546,7 @@
 
       <div class="products">
         <div class="card">
-          <svg class="icon" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="17" stroke="#5B3F2C" stroke-width="2"/><circle cx="20" cy="20" r="11" stroke="#5B3F2C" stroke-width="1.4"/><circle cx="20" cy="20" r="5" stroke="#C88A2E" stroke-width="1.4"/></svg>
+          <div class="icon-wrap"><svg class="icon" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="17" stroke="#5B3F2C" stroke-width="2"/><circle cx="20" cy="20" r="11" stroke="#5B3F2C" stroke-width="1.4"/><circle cx="20" cy="20" r="5" stroke="#C88A2E" stroke-width="1.4"/></svg></div>
           <span class="tag" id="wood1-tag">Cordwood — Option 1</span>
           <h3 id="wood1-name">Wood Type 1</h3>
           <p id="wood1-desc">Species and description coming soon. Good for stove or fireplace use — ask us on the lot for details.</p>
@@ -512,7 +554,7 @@
         </div>
 
         <div class="card">
-          <svg class="icon" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="17" stroke="#5B3F2C" stroke-width="2"/><circle cx="20" cy="20" r="11" stroke="#5B3F2C" stroke-width="1.4"/><circle cx="20" cy="20" r="5" stroke="#C88A2E" stroke-width="1.4"/></svg>
+          <div class="icon-wrap"><svg class="icon" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="17" stroke="#5B3F2C" stroke-width="2"/><circle cx="20" cy="20" r="11" stroke="#5B3F2C" stroke-width="1.4"/><circle cx="20" cy="20" r="5" stroke="#C88A2E" stroke-width="1.4"/></svg></div>
           <span class="tag" id="wood2-tag">Cordwood — Option 2</span>
           <h3 id="wood2-name">Wood Type 2</h3>
           <p id="wood2-desc">Species and description coming soon. A second option for those who want a mix or a different burn.</p>
@@ -520,7 +562,7 @@
         </div>
 
         <div class="card">
-          <svg class="icon" viewBox="0 0 40 40" fill="none"><path d="M6 28c3-10 8-16 14-16s11 6 14 16" stroke="#5B3F2C" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="30" r="1.6" fill="#C88A2E"/><circle cx="20" cy="32" r="1.6" fill="#C88A2E"/><circle cx="28" cy="30" r="1.6" fill="#C88A2E"/></svg>
+          <div class="icon-wrap"><svg class="icon" viewBox="0 0 40 40" fill="none"><path d="M6 28c3-10 8-16 14-16s11 6 14 16" stroke="#5B3F2C" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="30" r="1.6" fill="#C88A2E"/><circle cx="20" cy="32" r="1.6" fill="#C88A2E"/><circle cx="28" cy="30" r="1.6" fill="#C88A2E"/></svg></div>
           <span class="tag">By-product</span>
           <h3>Loose Sawdust</h3>
           <p id="sawdust-desc">Great for bedding, mulch, or shop use. Sold loose, straight into your trailer, by weight.</p>

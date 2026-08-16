@@ -392,6 +392,59 @@
   @media (max-width: 860px){ .split{ grid-template-columns: 1fr; } }
 
   /* ---------- Delivery banner ---------- */
+  /* ---------- Our Story ---------- */
+  .story{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    padding: 56px 48px;
+    clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+  }
+  .story-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 54px;
+    align-items:start;
+  }
+  .story-text p{
+    color: var(--ink-soft);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin: 0 0 18px;
+  }
+  .story-text p:last-child{ margin-bottom: 0; }
+  .story-photos{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .story-photos .wide{ grid-column: 1 / -1; }
+  .photo-placeholder{
+    background: var(--bg);
+    border: 1.5px dashed var(--moss);
+    aspect-ratio: 4 / 3;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap: 8px;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  }
+  .photo-placeholder svg{ width: 26px; height: 26px; opacity: 0.55; }
+  .photo-placeholder span{
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--moss);
+    text-align:center;
+    padding: 0 10px;
+  }
+
+  @media (max-width: 860px){
+    .story{ padding: 40px 26px; }
+    .story-grid{ grid-template-columns: 1fr; gap: 32px; }
+  }
+
   .delivery{
     background: var(--bark);
     color: var(--paper);
@@ -470,6 +523,7 @@
       <nav>
         <ul>
           <li><a href="#sell">What We Sell</a></li>
+          <li><a href="#story">Our Story</a></li>
           <li><a href="#how">How It Works</a></li>
           <li><a href="#visit">Hours &amp; Location</a></li>
           <li><a href="#contact">Contact</a></li>
@@ -567,6 +621,39 @@
           <h3>Loose Sawdust</h3>
           <p id="sawdust-desc">Great for bedding, mulch, or shop use. Sold loose, straight into your trailer, by weight.</p>
           <div class="price-line" id="sawdust-price">Priced per lb at pickup — call for today's rate</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ OUR STORY ============ -->
+  <div class="wrap">
+    <section id="story">
+      <div class="story">
+        <div class="section-head" style="margin-bottom: 34px;">
+          <div class="eyebrow">Our story</div>
+          <h2>Twenty years of wood, one hard season, a fresh start</h2>
+        </div>
+        <div class="story-grid">
+          <div class="story-text">
+            <p>This land in the Flathead Valley started out as a dairy farm. It was later sold and converted into a wood processing and bundling plant, supplying pallets of firewood to homes across the Pacific Northwest for close to twenty years — heat for the winter, wood for the weekend bonfire, and everything in between. MontanaTimberline took over the operation in recent years, continuing that legacy of keeping the valley supplied with good firewood.</p>
+            <p>In December 2025, a fire moved through our warehouse. Over three days, the building and everything in it were lost. It was a hard season for our crew and for the community we'd built alongside.</p>
+            <p>What came out of it is a simpler, more direct way of doing business. Instead of pre-bundled pallets, we now sell loose cordwood and sawdust straight off the lot — local, good-quality wood, weighed fair and sold honest, one trailer at a time.</p>
+          </div>
+          <div class="story-photos">
+            <div class="photo-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#7C8863" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="1.5"/><circle cx="9" cy="12" r="2.2"/><path d="M14 15l2.5-3 4.5 5"/><path d="M7 6l1.5-2.5h7L17 6"/></svg>
+              <span>The original farm</span>
+            </div>
+            <div class="photo-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#7C8863" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="1.5"/><circle cx="9" cy="12" r="2.2"/><path d="M14 15l2.5-3 4.5 5"/><path d="M7 6l1.5-2.5h7L17 6"/></svg>
+              <span>Before the fire</span>
+            </div>
+            <div class="photo-placeholder wide">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#7C8863" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="1.5"/><circle cx="9" cy="12" r="2.2"/><path d="M14 15l2.5-3 4.5 5"/><path d="M7 6l1.5-2.5h7L17 6"/></svg>
+              <span>MontanaTimberline today</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>

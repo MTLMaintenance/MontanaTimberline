@@ -439,6 +439,27 @@
     text-align:center;
     padding: 0 10px;
   }
+  .photo-embed{
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    border: 1px solid var(--line);
+  }
+  .photo-embed iframe{
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+  .photo-caption{
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--moss);
+    text-align:center;
+    margin-top: 8px;
+  }
 
   @media (max-width: 860px){
     .story{ padding: 40px 26px; }
@@ -636,22 +657,22 @@
         </div>
         <div class="story-grid">
           <div class="story-text">
-            <p>This land in the Flathead Valley started out as a dairy farm. It was later sold and converted into a wood processing and bundling plant, supplying pallets of firewood to homes across the Pacific Northwest for close to twenty years — heat for the winter, wood for the weekend bonfire, and everything in between. MontanaTimberline took over the operation in recent years, continuing that legacy of keeping the valley supplied with good firewood.</p>
+            <p>This land in the Flathead Valley started out as a dairy farm. It was later converted into MontanaTimberline, a wood processing and bundling plant that supplied pallets of firewood to homes across the Pacific Northwest for close to twenty years — heat for the winter, wood for the weekend bonfire, and everything in between.</p>
             <p>In December 2025, a fire moved through our warehouse. Over three days, the building and everything in it were lost. It was a hard season for our crew and for the community we'd built alongside.</p>
             <p>What came out of it is a simpler, more direct way of doing business. Instead of pre-bundled pallets, we now sell loose cordwood and sawdust straight off the lot — local, good-quality wood, weighed fair and sold honest, one trailer at a time.</p>
           </div>
           <div class="story-photos">
             <div class="photo-placeholder">
               <svg viewBox="0 0 24 24" fill="none" stroke="#7C8863" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="1.5"/><circle cx="9" cy="12" r="2.2"/><path d="M14 15l2.5-3 4.5 5"/><path d="M7 6l1.5-2.5h7L17 6"/></svg>
-              <span>The original farm</span>
+              <span>Before the fire</span>
             </div>
             <div class="photo-placeholder">
               <svg viewBox="0 0 24 24" fill="none" stroke="#7C8863" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="1.5"/><circle cx="9" cy="12" r="2.2"/><path d="M14 15l2.5-3 4.5 5"/><path d="M7 6l1.5-2.5h7L17 6"/></svg>
-              <span>Before the fire</span>
+              <span>Day of the fire</span>
             </div>
             <div class="photo-placeholder wide">
               <svg viewBox="0 0 24 24" fill="none" stroke="#7C8863" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="1.5"/><circle cx="9" cy="12" r="2.2"/><path d="M14 15l2.5-3 4.5 5"/><path d="M7 6l1.5-2.5h7L17 6"/></svg>
-              <span>MontanaTimberline today</span>
+              <span>Present day</span>
             </div>
           </div>
         </div>

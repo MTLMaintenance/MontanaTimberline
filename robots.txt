@@ -1,10 +1,16 @@
 # The site is still being built and tested — not ready to be indexed yet.
 # Once it's ready to go live, either delete this file or change the
 # rule below to allow crawling (see the commented-out version).
+#
+# Privacy Policy and Terms & Conditions are explicitly allowed below
+# so automated verification (e.g. Twilio's SMS compliance review) can
+# reach them even while the rest of the site stays blocked.
 
 User-agent: *
 Disallow: /
+Allow: /privacy.html
+Allow: /terms.html
 
-# When ready to go live, replace the two lines above with:
+# When ready to go live, replace the rules above with:
 # User-agent: *
 # Allow: /

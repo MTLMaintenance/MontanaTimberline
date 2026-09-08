@@ -1,9 +1,11 @@
 // functions/api/hours.js
 //
 // Public, read-only endpoint. The homepage's JavaScript fetches this
-// on page load to display the current hours. If nothing has been
-// stored yet (KV is empty), it returns null so the homepage falls
-// back to whatever's hard-coded in index.html.
+// on page load and picks out whichever season is currently active
+// based on today's date, matching the MTSMS "seasons" payload shape.
+//
+// Returns { data: null } if nothing has been posted yet, so the
+// homepage falls back to whatever's hard-coded in index.html.
 
 export async function onRequestGet(context) {
   const { env } = context;
@@ -19,8 +21,6 @@ export async function onRequestGet(context) {
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      // Short cache so a burst of visitors doesn't hammer KV, but
-      // updates still show up within a minute of Excel pushing them.
       "Cache-Control": "public, max-age=60",
     },
   });

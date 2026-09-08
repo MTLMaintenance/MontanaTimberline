@@ -716,8 +716,8 @@
       <div class="split">
         <div>
           <div class="info-block">
-            <h4>Winter Hours (Aug 15, 2026 – May 15, 2027)</h4>
-            <table class="hours-table">
+            <h4 id="hours-title">Winter Hours (Aug 15, 2026 – May 15, 2027)</h4>
+            <table class="hours-table" id="hours-table">
               <tr><td>Monday</td><td>Closed</td></tr>
               <tr><td>Tuesday</td><td>12:00 PM – 4:00 PM</td></tr>
               <tr><td>Wednesday</td><td>9:00 AM – 4:00 PM</td></tr>
@@ -726,10 +726,15 @@
               <tr><td>Saturday</td><td>8:00 AM – 12:00 PM</td></tr>
               <tr><td>Sunday</td><td>Closed</td></tr>
             </table>
-            <p style="font-size:0.85rem; color: var(--ink-soft); margin-top:14px; line-height:1.6;">
+            <p style="font-size:0.85rem; color: var(--ink-soft); margin-top:14px; line-height:1.6;" id="hours-note">
               Summer hours haven't been set yet — we'll post them as warmer weather gets closer.
               <strong style="color: var(--bark);">We are still closed to the public while we finish rebuilding, and are working toward reopening by the end of September.</strong>
             </p>
+          </div>
+          <div class="info-block">
+            <h4>Address</h4>
+            <p class="addr">1960 Helena Flats Rd<br>Kalispell, MT 59901</p>
+            <a class="btn btn-ghost" href="https://www.google.com/maps/search/?api=1&query=1960+Helena+Flats+Rd+Kalispell+MT+59901" target="_blank" rel="noopener">Open in Google Maps</a>
           </div>
         </div>
 
@@ -864,6 +869,51 @@
     }
   }
   loadLiveData();
+
+  /* ============================================================
+     LIVE HOURS FEED
+     ------------------------------------------------------------
+     Fetches current hours from our own /api/hours endpoint, which
+     is backed by Cloudflare KV. Excel's "UPDATE WEBSITE" macro
+     posts new hours to /api/update-hours, and this loads them here.
+
+     If nothing has been posted yet, or the fetch fails for any
+     reason, the hard-coded hours already in the HTML stay as-is —
+     nothing breaks either way.
+     ============================================================ */
+  async function loadHours(){
+    try{
+      const res = await fetch('/api/hours', { cache: "no-store" });
+      if(!res.ok) throw new Error("bad response");
+      const { data } = await res.json();
+      if(!data) return; // nothing posted yet — keep the hard-coded hours
+
+      if(data.season_label || data.effective_range){
+        const title = [data.season_label, data.effective_range ? `(${data.effective_range})` : ""]
+          .filter(Boolean).join(" ");
+        if(title) document.getElementById('hours-title').textContent = title;
+      }
+
+      if(Array.isArray(data.days) && data.days.length){
+        const table = document.getElementById('hours-table');
+        table.innerHTML = data.days.map(d =>
+          `<tr><td>${escapeHtml(d.day)}</td><td>${escapeHtml(d.hours)}</td></tr>`
+        ).join("");
+      }
+
+      if(data.note){
+        document.getElementById('hours-note').innerHTML = escapeHtml(data.note);
+      }
+    }catch(err){
+      console.log("Live hours feed not available yet:", err.message);
+    }
+  }
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+  loadHours();
 </script>
 
 </body>

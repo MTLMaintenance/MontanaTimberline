@@ -1,20 +1,40 @@
 // functions/api/update-hours.js
 //
-// Receives a POST from the Excel "UPDATE WEBSITE" macro and stores
-// the submitted hours in Cloudflare KV. The website's homepage reads
-// from KV (via /api/hours) to display the current hours — no GitHub
-// commit or redeploy needed for routine hour changes.
+// Receives the POST sent by the MTSMS Excel workbook's "UPDATE WEBSITE"
+// button (Settings sheet, cell trigger) and stores it in Cloudflare KV.
+// The website's /api/hours endpoint serves this back out to the homepage.
 //
-// SECURITY: requires a secret header (X-Update-Secret) matching the
-// UPDATE_SECRET environment variable set in Cloudflare. Without a
-// matching secret, the request is rejected.
+// This matches the MTSMS v4.46 "Website Hours Sync" contract exactly:
 //
-// REQUIRED SETUP (see instructions doc):
-// 1. Create a KV namespace in Cloudflare and bind it to this Pages
-//    project as "HOURS_KV" (Settings → Functions → KV namespace bindings).
-// 2. Add an environment variable UPDATE_SECRET (Settings → Environment
-//    variables) — a long random string, kept secret, shared only with
-//    the Excel macro.
+//   Method: POST
+//   Content-Type: application/json; charset=utf-8
+//   Header: X-MTSMS-Key: <secret, matches UPDATE_SECRET below>
+//
+//   Body shape:
+//   {
+//     "source": "MTSMS",
+//     "version": "4.46",
+//     "updatedAt": "2026-09-08T14:32:00",
+//     "seasons": [
+//       {
+//         "name": "Fall-Winter",
+//         "start": "08/15",
+//         "end": "05/15",
+//         "note": "...",
+//         "hours": [
+//           {"day":"Sunday","closed":true},
+//           {"day":"Monday","closed":false,"open":"12:00 PM","close":"4:00 PM"},
+//           ...
+//         ]
+//       },
+//       { "name": "Spring-Summer", ... }
+//     ]
+//   }
+//
+// REQUIRED SETUP (already done as of this build):
+// 1. KV namespace bound to this Pages project as "HOURS_KV".
+// 2. Environment variable UPDATE_SECRET set in Cloudflare — this must
+//    match exactly what's entered in the Excel Settings sheet, cell J54.
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -26,8 +46,8 @@ export async function onRequestPost(context) {
     return json({ error: "HOURS_KV namespace isn't bound to this project yet." }, 503);
   }
 
-  const providedSecret = request.headers.get("X-Update-Secret");
-  if (providedSecret !== env.UPDATE_SECRET) {
+  const providedKey = request.headers.get("X-MTSMS-Key");
+  if (providedKey !== env.UPDATE_SECRET) {
     return json({ error: "Unauthorized." }, 401);
   }
 
@@ -38,26 +58,21 @@ export async function onRequestPost(context) {
     return json({ error: "Invalid JSON body." }, 400);
   }
 
-  // Basic shape validation — expects:
-  // {
-  //   "effective_range": "Aug 15, 2026 – May 15, 2027",
-  //   "season_label": "Winter Hours",
-  //   "days": [
-  //     { "day": "Monday", "hours": "Closed" },
-  //     { "day": "Tuesday", "hours": "12:00 PM – 4:00 PM" },
-  //     ...
-  //   ],
-  //   "note": "optional free-text note shown below the table"
-  // }
-  if (!payload || !Array.isArray(payload.days)) {
-    return json({ error: "Payload must include a 'days' array." }, 400);
+  if (!payload || !Array.isArray(payload.seasons) || payload.seasons.length === 0) {
+    return json({ error: "Payload must include a non-empty 'seasons' array." }, 400);
   }
 
-  payload.updated_at = new Date().toISOString();
+  // Light validation on each season so a malformed entry from Excel
+  // doesn't silently break the homepage.
+  for (const season of payload.seasons) {
+    if (!season.name || !season.start || !season.end || !Array.isArray(season.hours)) {
+      return json({ error: `Season '${season.name || "(unnamed)"}' is missing required fields.` }, 400);
+    }
+  }
 
   await env.HOURS_KV.put("current_hours", JSON.stringify(payload));
 
-  return json({ success: true, updated_at: payload.updated_at }, 200);
+  return json({ success: true, receivedAt: new Date().toISOString(), seasons: payload.seasons.length }, 200);
 }
 
 function json(body, status) {

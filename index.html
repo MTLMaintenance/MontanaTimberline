@@ -871,38 +871,67 @@
   loadLiveData();
 
   /* ============================================================
-     LIVE HOURS FEED
+     LIVE HOURS FEED (MTSMS Excel contract)
      ------------------------------------------------------------
      Fetches current hours from our own /api/hours endpoint, which
-     is backed by Cloudflare KV. Excel's "UPDATE WEBSITE" macro
-     posts new hours to /api/update-hours, and this loads them here.
+     is backed by Cloudflare KV. The Excel workbook's "UPDATE WEBSITE"
+     button posts a "seasons" array (each with an MM/DD start/end
+     range) to /api/update-hours. This picks whichever season is
+     active today and displays it.
 
      If nothing has been posted yet, or the fetch fails for any
      reason, the hard-coded hours already in the HTML stay as-is —
      nothing breaks either way.
      ============================================================ */
+  const DAY_ORDER = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+  function isSeasonActiveToday(startMMDD, endMMDD){
+    // startMMDD/endMMDD look like "08/15" — no year. Handles ranges
+    // that wrap across the New Year (e.g. Aug 15 -> May 15).
+    const today = new Date();
+    const toDayOfYear = (mmdd) => {
+      const [mm, dd] = mmdd.split("/").map(Number);
+      // Use a fixed non-leap reference year so comparisons are stable.
+      return new Date(2001, mm - 1, dd).getTime();
+    };
+    const todayRef = new Date(2001, today.getMonth(), today.getDate()).getTime();
+    const start = toDayOfYear(startMMDD);
+    const end = toDayOfYear(endMMDD);
+
+    if (start <= end) {
+      return todayRef >= start && todayRef <= end;
+    }
+    // Wraps around the year boundary (e.g. 08/15 -> 05/15)
+    return todayRef >= start || todayRef <= end;
+  }
+
   async function loadHours(){
     try{
       const res = await fetch('/api/hours', { cache: "no-store" });
       if(!res.ok) throw new Error("bad response");
       const { data } = await res.json();
-      if(!data) return; // nothing posted yet — keep the hard-coded hours
+      if(!data || !Array.isArray(data.seasons) || !data.seasons.length) return;
 
-      if(data.season_label || data.effective_range){
-        const title = [data.season_label, data.effective_range ? `(${data.effective_range})` : ""]
-          .filter(Boolean).join(" ");
-        if(title) document.getElementById('hours-title').textContent = title;
-      }
+      const activeSeason = data.seasons.find(s => isSeasonActiveToday(s.start, s.end)) || data.seasons[0];
 
-      if(Array.isArray(data.days) && data.days.length){
-        const table = document.getElementById('hours-table');
-        table.innerHTML = data.days.map(d =>
-          `<tr><td>${escapeHtml(d.day)}</td><td>${escapeHtml(d.hours)}</td></tr>`
-        ).join("");
-      }
+      const title = `${activeSeason.name} Hours (${activeSeason.start} – ${activeSeason.end})`;
+      document.getElementById('hours-title').textContent = title;
 
-      if(data.note){
-        document.getElementById('hours-note').innerHTML = escapeHtml(data.note);
+      const byDay = {};
+      (activeSeason.hours || []).forEach(h => { byDay[h.day] = h; });
+
+      const table = document.getElementById('hours-table');
+      table.innerHTML = DAY_ORDER.map(day => {
+        const entry = byDay[day];
+        let hoursText = "—";
+        if (entry) {
+          hoursText = entry.closed ? "Closed" : `${entry.open} – ${entry.close}`;
+        }
+        return `<tr><td>${escapeHtml(day)}</td><td>${escapeHtml(hoursText)}</td></tr>`;
+      }).join("");
+
+      if(activeSeason.note){
+        document.getElementById('hours-note').innerHTML = escapeHtml(activeSeason.note);
       }
     }catch(err){
       console.log("Live hours feed not available yet:", err.message);

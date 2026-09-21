@@ -449,6 +449,10 @@
     object-fit: cover;
     display: block;
   }
+  /* Keep the main building centered in the wide pre-fire photo. */
+  .photo-carousel .slide img.before-fire-photo{
+    object-position: 63% center;
+  }
   .photo-carousel .slide figcaption{
     position: absolute;
     left: 0; right: 0; bottom: 0;
@@ -704,7 +708,7 @@
                 <figcaption>Lot today</figcaption>
               </figure>
               <figure class="slide">
-                <img src="images/lot-before-fire.jpg" alt="The Montana Timberline Firewood lot before the fire, showing the main building and yard" loading="lazy" width="1799" height="703">
+                <img class="before-fire-photo" src="images/lot-before-fire.png" alt="The Montana Timberline Firewood lot before the fire, showing the main building and yard" loading="lazy" width="1799" height="703">
                 <figcaption>The lot before the fire</figcaption>
               </figure>
               <figure class="slide">

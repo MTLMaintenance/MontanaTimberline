@@ -427,53 +427,65 @@
     margin: 0 0 18px;
   }
   .story-text p:last-child{ margin-bottom: 0; }
-  .story-photos{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-  .story-photos .wide{ grid-column: 1 / -1; }
-  .photo-placeholder{
-    background: var(--bg);
-    border: 1.5px dashed var(--moss);
-    aspect-ratio: 4 / 3;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap: 8px;
-    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  }
-  .photo-placeholder svg{ width: 26px; height: 26px; opacity: 0.55; }
-  .photo-placeholder span{
-    font-family: var(--mono);
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--moss);
-    text-align:center;
-    padding: 0 10px;
-  }
-  .photo-embed{
-    aspect-ratio: 4 / 3;
+  /* ---- Story photo carousel ---- */
+  .photo-carousel{
+    position: relative;
+    aspect-ratio: 3 / 4;
     overflow: hidden;
-    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-    border: 1px solid var(--line);
+    border: 1.5px solid var(--line);
+    background: var(--bg);
+    clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
   }
-  .photo-embed iframe{
+  .photo-carousel .slide{
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 900ms ease-in-out;
+  }
+  .photo-carousel .slide.active{ opacity: 1; }
+  .photo-carousel .slide img{
     width: 100%;
     height: 100%;
-    border: 0;
+    object-fit: cover;
     display: block;
   }
-  .photo-caption{
+  .photo-carousel .slide figcaption{
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 26px 18px 14px;
+    background: linear-gradient(to top, rgba(20,16,10,0.82), rgba(20,16,10,0));
+    color: #F6F1E3;
     font-family: var(--mono);
-    font-size: 0.68rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--moss);
-    text-align:center;
-    margin-top: 8px;
+    margin: 0;
+  }
+  .carousel-dots{
+    display: flex;
+    justify-content: center;
+    gap: 9px;
+    margin-top: 14px;
+  }
+  .carousel-dots button{
+    width: 9px;
+    height: 9px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--moss);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .carousel-dots button[aria-selected="true"]{
+    background: var(--amber-dark);
+    border-color: var(--amber-dark);
+    transform: scale(1.25);
+  }
+  .carousel-dots button:hover{ background: var(--moss); }
+
+  @media (prefers-reduced-motion: reduce){
+    .photo-carousel .slide{ transition: none; }
   }
 
   @media (max-width: 860px){
@@ -685,19 +697,34 @@
             <p>In December 2025, a fire moved through our warehouse. Over three days, the building and everything in it were lost. It was a hard season for our crew and for the community we'd built alongside.</p>
             <p>What came out of it is a simpler, more direct way of doing business. Instead of pre-bundled pallets, we now sell loose cordwood and sawdust straight off the lot — local, good-quality wood, weighed fair and sold honest, one trailer at a time.</p>
           </div>
-          <div class="story-photos">
-            <div class="photo-placeholder">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#7C8863" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="1.5"/><circle cx="9" cy="12" r="2.2"/><path d="M14 15l2.5-3 4.5 5"/><path d="M7 6l1.5-2.5h7L17 6"/></svg>
-              <span>Before the fire</span>
+          <div>
+            <div class="photo-carousel" id="story-carousel" aria-label="Photos from our lot" aria-roledescription="carousel">
+              <figure class="slide active">
+                <img src="images/log-decks-corridor.jpg" alt="Rows of stacked logs forming a corridor at the Montana Timberline Firewood lot" width="1050" height="1400">
+                <figcaption>The lot today</figcaption>
+              </figure>
+              <figure class="slide">
+                <img src="images/firewood-processor.jpg" alt="The firewood processor with its circular saw blade, parked on the lot" loading="lazy" width="1050" height="1400">
+                <figcaption>Our firewood processor</figcaption>
+              </figure>
+              <figure class="slide">
+                <img src="images/processor-conveyor.jpg" alt="Freshly split firewood riding up the processor's conveyor against a blue sky" loading="lazy" width="1050" height="1400">
+                <figcaption>Fresh splits off the conveyor</figcaption>
+              </figure>
+              <figure class="slide">
+                <img src="images/log-pile-ends.jpg" alt="Close view of the cut ends of a large stacked log pile" loading="lazy" width="1050" height="1400">
+                <figcaption>Ready for the processor</figcaption>
+              </figure>
+              <figure class="slide">
+                <img src="images/split-wood.jpg" alt="Split firewood collected in the bed after processing" loading="lazy" width="1050" height="1400">
+                <figcaption>Split and ready to load</figcaption>
+              </figure>
+              <figure class="slide">
+                <img src="images/log-deck-row.jpg" alt="A long row of stacked logs running the length of the lot" loading="lazy" width="1050" height="1400">
+                <figcaption>Our supply on hand</figcaption>
+              </figure>
             </div>
-            <div class="photo-placeholder">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#7C8863" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="1.5"/><circle cx="9" cy="12" r="2.2"/><path d="M14 15l2.5-3 4.5 5"/><path d="M7 6l1.5-2.5h7L17 6"/></svg>
-              <span>Day of the fire</span>
-            </div>
-            <div class="photo-placeholder wide">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#7C8863" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="1.5"/><circle cx="9" cy="12" r="2.2"/><path d="M14 15l2.5-3 4.5 5"/><path d="M7 6l1.5-2.5h7L17 6"/></svg>
-              <span>Present day</span>
-            </div>
+            <div class="carousel-dots" id="carousel-dots" role="tablist" aria-label="Choose a photo"></div>
           </div>
         </div>
       </div>
@@ -951,6 +978,60 @@
     return div.innerHTML;
   }
   loadHours();
+
+  /* ============================================================
+     STORY PHOTO CAROUSEL
+     Cycles through the lot photos every 5 seconds. Pauses while
+     the pointer is over it, and when the tab isn't visible.
+     Dots let people jump to a specific photo.
+     ============================================================ */
+  (function(){
+    const carousel = document.getElementById('story-carousel');
+    const dotsWrap = document.getElementById('carousel-dots');
+    if(!carousel || !dotsWrap) return;
+
+    const slides = Array.from(carousel.querySelectorAll('.slide'));
+    if(slides.length < 2) return;
+
+    const INTERVAL = 5000;
+    let current = 0;
+    let timer = null;
+    let paused = false;
+
+    // Build the dot controls
+    slides.forEach((slide, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.setAttribute('role', 'tab');
+      const label = slide.querySelector('figcaption');
+      dot.setAttribute('aria-label', label ? label.textContent : ('Photo ' + (i+1)));
+      dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+      dot.addEventListener('click', () => { show(i); restart(); });
+      dotsWrap.appendChild(dot);
+    });
+    const dots = Array.from(dotsWrap.children);
+
+    function show(i){
+      slides[current].classList.remove('active');
+      dots[current].setAttribute('aria-selected', 'false');
+      current = (i + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dots[current].setAttribute('aria-selected', 'true');
+    }
+
+    function tick(){ if(!paused) show(current + 1); }
+    function start(){ if(!timer) timer = setInterval(tick, INTERVAL); }
+    function stop(){ clearInterval(timer); timer = null; }
+    function restart(){ stop(); start(); }
+
+    carousel.addEventListener('mouseenter', () => { paused = true; });
+    carousel.addEventListener('mouseleave', () => { paused = false; });
+    document.addEventListener('visibilitychange', () => {
+      document.hidden ? stop() : start();
+    });
+
+    start();
+  })();
 </script>
 
 </body>

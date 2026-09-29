@@ -650,8 +650,7 @@
       <div class="section-head">
         <div class="eyebrow">On the lot</div>
         <h2>What we sell</h2>
-        <p>Two loose cordwood options and sawdust, all priced by the pound at pickup. Species and current
-          rates are being finalized — call ahead for today's pricing.</p>
+        <p>Two loose cordwood options and sawdust, all priced by the pound at pickup. Current live pricing is shown below.</p>
         <p id="data-freshness" style="font-family: var(--mono); font-size: 0.75rem; color: var(--moss); margin-top: 10px; display:none;"></p>
       </div>
 
@@ -661,7 +660,7 @@
           <span class="tag" id="wood1-tag">Cordwood — Softwood Mix</span>
           <h3 id="wood1-name">White Wood</h3>
           <p id="wood1-desc">A mixed softwood pile — Grand Fir, White Pine, Yellow Pine, Bull Pine, Spruce, Lodgepole Pine, and Cedar. Lighter by weight and easier on the wallet than our Red Wood mix, White Wood catches quick and burns clean — a great everyday choice for stoves, fireplaces, and weekend bonfires.</p>
-          <div class="price-line" id="wood1-price">Priced per lb at pickup — call for today's rate</div>
+          <div class="price-line" id="wood1-price">$0.06 / lb at pickup</div>
         </div>
 
         <div class="card">
@@ -669,7 +668,7 @@
           <span class="tag" id="wood2-tag">Cordwood — Red Wood Mix</span>
           <h3 id="wood2-name">Red Wood</h3>
           <p id="wood2-desc">A mixed pile of Douglas-fir and Western Larch (Tamarack) — denser wood that burns hotter and longer than White Wood. Built for cold Montana nights and anyone who wants a fire that holds through the evening.</p>
-          <div class="price-line" id="wood2-price">Priced per lb at pickup — call for today's rate</div>
+          <div class="price-line" id="wood2-price">$0.07 / lb at pickup</div>
         </div>
 
         <div class="card">
@@ -677,7 +676,7 @@
           <span class="tag">By-product</span>
           <h3>Loose Sawdust</h3>
           <p id="sawdust-desc">Great for bedding, mulch, or shop use. Sold loose, straight into your trailer, by weight.</p>
-          <div class="price-line" id="sawdust-price">Priced per lb at pickup — call for today's rate</div>
+          <div class="price-line" id="sawdust-price">$0.04 / lb at pickup</div>
         </div>
       </div>
     </section>
@@ -847,38 +846,22 @@
   document.getElementById('yr').textContent = new Date().getFullYear();
 
   /* ============================================================
-     LIVE PRICING / STOCK FEED
+     LIVE PRICING / STOCK FEED (MTSMS Excel contract)
      ------------------------------------------------------------
-     This pulls current prices + stock status from a small JSON
-     file that gets exported out of the Excel POS workbook (via a
-     macro) and synced to a cloud folder (OneDrive / Google Drive).
+     Fetches the latest pricing from /api/pricing. The Settings tab
+     in MTSMS publishes White Wood, Red Wood, and Loose Sawdust
+     pricing when UPDATE WEBSITE is clicked.
 
-     TO ACTIVATE:
-     1. Get the "anyone with the link can view" / direct file URL
-        for the exported JSON once it's synced to the cloud.
-     2. Paste that URL into DATA_URL below.
-     That's it — everything else here already handles it.
-
-     If DATA_URL is empty, or the fetch fails for any reason, the
-     page just keeps showing the static "call for today's rate"
-     text already in the HTML. Nothing breaks either way.
-
-     EXPECTED JSON SHAPE (see excel-export-instructions.txt):
-     {
-       "updated_at": "2026-08-13T09:15:00",
-       "wood1": { "name": "Lodgepole Pine", "desc": "...", "price_per_lb": 0.09, "in_stock": true },
-       "wood2": { "name": "Douglas Fir",   "desc": "...", "price_per_lb": 0.11, "in_stock": true },
-       "sawdust": { "desc": "...", "price_per_lb": 0.02, "in_stock": true }
-     }
+     If no live pricing has been published yet, or the fetch fails,
+     the hard-coded fallback prices in the HTML remain visible.
      ============================================================ */
-  const DATA_URL = ""; // <-- paste the published JSON link here when ready
-
   async function loadLiveData(){
-    if(!DATA_URL) return;
     try{
-      const res = await fetch(DATA_URL, { cache: "no-store" });
+      const res = await fetch('/api/pricing', { cache: "no-store" });
       if(!res.ok) throw new Error("bad response");
-      const data = await res.json();
+      const result = await res.json();
+      const data = result && result.data;
+      if(!data) return;
 
       const setPrice = (elId, item) => {
         const el = document.getElementById(elId);
@@ -890,30 +873,21 @@
         }
       };
 
-      if(data.wood1){
-        if(data.wood1.name) document.getElementById('wood1-name').textContent = data.wood1.name;
-        if(data.wood1.desc) document.getElementById('wood1-desc').textContent = data.wood1.desc;
-        setPrice('wood1-price', data.wood1);
-      }
-      if(data.wood2){
-        if(data.wood2.name) document.getElementById('wood2-name').textContent = data.wood2.name;
-        if(data.wood2.desc) document.getElementById('wood2-desc').textContent = data.wood2.desc;
-        setPrice('wood2-price', data.wood2);
-      }
-      if(data.sawdust){
-        if(data.sawdust.desc) document.getElementById('sawdust-desc').textContent = data.sawdust.desc;
-        setPrice('sawdust-price', data.sawdust);
-      }
-      if(data.updated_at){
+      setPrice('wood1-price', data.wood1);
+      setPrice('wood2-price', data.wood2);
+      setPrice('sawdust-price', data.sawdust);
+
+      const updatedAt = data.updatedAt || data.updated_at;
+      if(updatedAt){
         const el = document.getElementById('data-freshness');
-        el.textContent = "Pricing last updated " + new Date(data.updated_at).toLocaleString();
+        el.textContent = "Pricing last updated " + new Date(updatedAt).toLocaleString();
         el.style.display = "block";
       }
     }catch(err){
-      // Fetch failed or file not ready yet — static placeholder text stays as-is.
       console.log("Live pricing feed not available yet:", err.message);
     }
   }
+
   loadLiveData();
 
   /* ============================================================

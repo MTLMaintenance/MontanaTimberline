@@ -1,10 +1,3 @@
-function findD1(env) {
-  for (const [name, value] of Object.entries(env || {})) {
-    if (value && typeof value.prepare === "function") return value;
-  }
-  return null;
-}
-
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -18,13 +11,39 @@ function json(data, status = 200) {
 function authorized(request, env) {
   const supplied = request.headers.get("X-MTSMS-Sync-Key") || "";
   const expected = env.MTSMS_SYNC_SECRET || "";
-  return expected && supplied === expected;
+  return Boolean(expected) && supplied === expected;
+}
+
+function findD1(env) {
+  // Try common binding names first, then safely inspect the remaining bindings.
+  const preferred = ["DB", "MTSMS_DB", "D1", "DATABASE"];
+  for (const name of preferred) {
+    try {
+      const value = env && env[name];
+      if (value && typeof value.prepare === "function") {
+        return { db: value, name };
+      }
+    } catch (_) {}
+  }
+
+  for (const name of Object.keys(env || {})) {
+    try {
+      const value = env[name];
+      if (value && typeof value.prepare === "function") {
+        return { db: value, name };
+      }
+    } catch (_) {}
+  }
+
+  return { db: null, name: "" };
 }
 
 async function ensureTable(db) {
+  // Keep the schema deliberately simple for the live channel.
+  // INTEGER PRIMARY KEY auto-generates an increasing row id in SQLite/D1.
   await db.prepare(`
     CREATE TABLE IF NOT EXISTS mtsms_live_events (
-      seq INTEGER PRIMARY KEY AUTOINCREMENT,
+      seq INTEGER PRIMARY KEY,
       event_id TEXT NOT NULL UNIQUE,
       source_device TEXT NOT NULL,
       event_type TEXT NOT NULL,
@@ -33,64 +52,129 @@ async function ensureTable(db) {
       created_at TEXT NOT NULL
     )
   `).run();
-  await db.prepare(`CREATE INDEX IF NOT EXISTS idx_mtsms_live_events_seq ON mtsms_live_events(seq)`).run();
-  await db.prepare(`CREATE INDEX IF NOT EXISTS idx_mtsms_live_events_created ON mtsms_live_events(created_at)`).run();
 }
 
 export async function onRequest(context) {
   const { request, env } = context;
-  if (!authorized(request, env)) return json({ ok: false, error: "Unauthorized" }, 401);
 
-  const db = findD1(env);
-  if (!db) return json({ ok: false, error: "No D1 binding found in this Pages project." }, 503);
-
-  await ensureTable(db);
-  const url = new URL(request.url);
-
-  if (request.method === "POST") {
-    let body;
-    try { body = await request.json(); }
-    catch { return json({ ok: false, error: "Invalid JSON body" }, 400); }
-
-    const eventId = String(body.event_id || "").trim();
-    const source = String(body.source_device || request.headers.get("X-MTSMS-Device") || "").trim();
-    const eventType = String(body.event_type || "STATE").trim();
-    const ticket = String(body.ticket || "").trim();
-    const payload = String(body.payload_b64 || "").trim();
-    const createdAt = String(body.created_at || new Date().toISOString()).trim();
-
-    if (!eventId || !source || !payload) {
-      return json({ ok: false, error: "event_id, source_device, and payload_b64 are required" }, 400);
+  try {
+    if (!authorized(request, env)) {
+      return json({ ok: false, error: "Unauthorized" }, 401);
     }
 
-    await db.prepare(`
-      INSERT OR IGNORE INTO mtsms_live_events
-      (event_id, source_device, event_type, ticket, payload_b64, created_at)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).bind(eventId, source, eventType, ticket, payload, createdAt).run();
+    const found = findD1(env);
+    if (!found.db) {
+      return json({
+        ok: false,
+        error: "No D1 binding found in this Pages project."
+      }, 503);
+    }
 
-    // Keep the live-event table small. Historical business records remain in the normal sync tables.
-    await db.prepare(`DELETE FROM mtsms_live_events WHERE datetime(created_at) < datetime('now','-2 days')`).run();
+    const db = found.db;
+    await ensureTable(db);
 
-    const row = await db.prepare(`SELECT seq FROM mtsms_live_events WHERE event_id = ?`).bind(eventId).first();
-    return json({ ok: true, seq: row ? row.seq : 0, event_id: eventId });
+    const url = new URL(request.url);
+
+    if (request.method === "POST") {
+      let body;
+      try {
+        body = await request.json();
+      } catch (_) {
+        return json({ ok: false, error: "Invalid JSON body" }, 400);
+      }
+
+      const eventId = String(body.event_id || "").trim();
+      const source = String(
+        body.source_device ||
+        request.headers.get("X-MTSMS-Device") ||
+        ""
+      ).trim();
+      const eventType = String(body.event_type || "STATE").trim();
+      const ticket = String(body.ticket || "").trim();
+      const payload = String(body.payload_b64 || "").trim();
+      const createdAt = String(body.created_at || new Date().toISOString()).trim();
+
+      if (!eventId || !source || !payload) {
+        return json({
+          ok: false,
+          error: "event_id, source_device, and payload_b64 are required"
+        }, 400);
+      }
+
+      await db.prepare(`
+        INSERT OR IGNORE INTO mtsms_live_events
+        (event_id, source_device, event_type, ticket, payload_b64, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).bind(
+        eventId,
+        source,
+        eventType,
+        ticket,
+        payload,
+        createdAt
+      ).run();
+
+      const row = await db.prepare(`
+        SELECT seq
+        FROM mtsms_live_events
+        WHERE event_id = ?
+      `).bind(eventId).first();
+
+      return json({
+        ok: true,
+        seq: row ? Number(row.seq || 0) : 0,
+        event_id: eventId,
+        d1_binding: found.name
+      });
+    }
+
+    if (request.method === "GET") {
+      const after = Math.max(
+        0,
+        Number(url.searchParams.get("after") || 0) || 0
+      );
+      const device = String(
+        url.searchParams.get("device") ||
+        request.headers.get("X-MTSMS-Device") ||
+        ""
+      ).trim();
+      const limit = Math.min(
+        50,
+        Math.max(1, Number(url.searchParams.get("limit") || 25) || 25)
+      );
+
+      const result = await db.prepare(`
+        SELECT
+          seq,
+          event_id,
+          source_device,
+          event_type,
+          ticket,
+          payload_b64,
+          created_at
+        FROM mtsms_live_events
+        WHERE seq > ?
+          AND source_device <> ?
+        ORDER BY seq ASC
+        LIMIT ?
+      `).bind(after, device, limit).all();
+
+      return json({
+        ok: true,
+        events: result.results || [],
+        d1_binding: found.name
+      });
+    }
+
+    return json({ ok: false, error: "Method not allowed" }, 405);
+
+  } catch (err) {
+    // Return the actual runtime/D1 error instead of allowing Cloudflare
+    // to replace it with generic Worker error 1101.
+    return json({
+      ok: false,
+      error: "mtsms-live runtime error",
+      detail: String(err && err.message ? err.message : err)
+    }, 500);
   }
-
-  if (request.method === "GET") {
-    const after = Math.max(0, Number(url.searchParams.get("after") || 0) || 0);
-    const device = String(url.searchParams.get("device") || request.headers.get("X-MTSMS-Device") || "").trim();
-    const limit = Math.min(50, Math.max(1, Number(url.searchParams.get("limit") || 25) || 25));
-
-    const result = await db.prepare(`
-      SELECT seq, event_id, source_device, event_type, ticket, payload_b64, created_at
-      FROM mtsms_live_events
-      WHERE seq > ? AND source_device <> ?
-      ORDER BY seq ASC
-      LIMIT ?
-    `).bind(after, device, limit).all();
-
-    return json({ ok: true, events: result.results || [] });
-  }
-
-  return json({ ok: false, error: "Method not allowed" }, 405);
 }
